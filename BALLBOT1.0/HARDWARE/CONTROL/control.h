@@ -28,5 +28,8 @@ int balance_X(float Angle,float Gyro);
 int balance_Y(float Angle,float Gyro);
 int velocity_X(int velocity);
 int velocity_Y(int velocity);
-		 				    
+void Set_Pwm(int motor_a,int motor_b,int motor_c);
+u16  Linear_Conversion(int motor);
+void Xianfu_Pwm(int amplitude);
+u32 my_abs( int a);
 #endif

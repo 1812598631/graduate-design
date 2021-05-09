@@ -65,7 +65,8 @@ delay_us(half_period);
 void set_motorA_speed(u8 dir,u16 speed)
 {
 	u32 arr;
-	arr=get_CCR(36,speed);
+	//arr=get_CCR(36,speed);
+	arr=speed;
 	/*
   TIM_PrescalerConfig(TIM3,CCR1_Val,TIM_PSCReloadMode_Immediate);
   TIM_SetCounter(TIM3,0);
@@ -77,8 +78,6 @@ void set_motorA_speed(u8 dir,u16 speed)
 		TIM3->CCR4=arr/2;//保持占空比为50%
 		TIM_ARRPreloadConfig(TIM3,ENABLE);
 		TIM_Cmd(TIM3,ENABLE);
-		  USART_SendData(USART1, 0X0D);
-	  USART_SendData(USART1, 0X0A);	
 	if(dir==0)
 	{
 	GPIO_SetBits(GPIOA,GPIO_Pin_1);
@@ -92,15 +91,14 @@ void set_motorA_speed(u8 dir,u16 speed)
 void set_motorB_speed(u8 dir,u16 speed)
 {
 	u32 arr;
-	arr=get_CCR(36,speed);
-		TIM_ARRPreloadConfig(TIM4,DISABLE);
+	//arr=get_CCR(36,speed);
+		arr=speed;	
+	TIM_ARRPreloadConfig(TIM2,DISABLE);
 		
-		TIM4->ARR=arr;//计数到10000在归零重新计数
-		TIM4->CCR4=arr/2;//保持占空比为50%
-		TIM_ARRPreloadConfig(TIM4,ENABLE);
-		TIM_Cmd(TIM4,ENABLE);
-	  USART_SendData(USART1, 0X0D);
-	  USART_SendData(USART1, 0X0A);	 //回车
+		TIM2->ARR=arr;//计数到10000在归零重新计数
+		TIM2->CCR4=arr/2;//保持占空比为50%
+		TIM_ARRPreloadConfig(TIM2,ENABLE);
+		TIM_Cmd(TIM2,ENABLE);
 	if(dir==0)
 	{
 	GPIO_SetBits(GPIOA,GPIO_Pin_2);
@@ -113,13 +111,14 @@ void set_motorB_speed(u8 dir,u16 speed)
 void set_motorC_speed(u8 dir,u16 speed)
 {
 	u32 arr;
-	arr=get_CCR(36,speed);
-		TIM_ARRPreloadConfig(TIM2,DISABLE);
+	//arr=get_CCR(36,speed);
+		arr=speed;	
+	TIM_ARRPreloadConfig(TIM4,DISABLE);
 		
-		TIM2->ARR=arr;//计数到10000在归零重新计数
-		TIM2->CCR1=arr/2;//保持占空比为50%
-		TIM_ARRPreloadConfig(TIM2,ENABLE);
-		TIM_Cmd(TIM2,ENABLE);
+		TIM4->ARR=arr;//计数到10000在归零重新计数
+		TIM4->CCR1=arr/2;//保持占空比为50%
+		TIM_ARRPreloadConfig(TIM4,ENABLE);
+		TIM_Cmd(TIM4,ENABLE);
 		//printf("arr_c=%d",arr);
 
 	if(dir==0)
@@ -133,13 +132,17 @@ void set_motorC_speed(u8 dir,u16 speed)
 }
 void set_motor(int motor_a,int motor_b,int motor_c)
 {
-    	if(motor_a>0)			set_motorA_speed(0,motor_a);//根据BTN7971芯片写控制逻辑
-			else  	          set_motorA_speed(1,-motor_a);//根据BTN7971芯片写控制逻辑
+    	if(motor_a>0)			set_motorA_speed(0,motor_a);
+			else  	          set_motorA_speed(1,-motor_a);
 		
 		  if(motor_b>0)			set_motorB_speed(0,motor_b);
 			else 	            set_motorB_speed(1,-motor_b);
 	
 	    if(motor_c>0)			set_motorC_speed(0,motor_c);
 			else 	            set_motorC_speed(1,-motor_c);
+//	printf("motor_A:%d",motor_a);
+//	printf("motor_B:%d",motor_b);
+//	printf("motor_C:%d\r\n",motor_c);
+    
 }
 

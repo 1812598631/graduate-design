@@ -1,4 +1,7 @@
 #include "pwm.h"
+#include "sys.h"
+#include "control.h"
+
 volatile u32 pulse_width1 = 0;
 volatile u32	direction1 = 0;
 volatile u32 pulse_width2 = 0;
@@ -22,11 +25,96 @@ float duty1=0.5;
 float duty2=0.5;
 u16 capture=0;
 u8 pa6_state=0,pa7_state=0;
+
+
+
+
+void Tim1_Init(int arr,int psc)//5ms进入一次
+{ 
+   TIM_TimeBaseInitTypeDef TIM_Structure;               //定义定时器结构体变量
+	 NVIC_InitTypeDef NVIC_TIM;                           //定义中断嵌套结构体变量
+	 RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM1,ENABLE);  //打开定时器时钟
+	 
+	 TIM_Structure.TIM_Period = (arr-1) ;         //设置自动重装载寄存器周期值  溢出时间TimeOut= (arr)*(psc)/Tic    单位为us
+   TIM_Structure.TIM_Prescaler = (psc-1);       //设置预分频值     
+   TIM_Structure.TIM_CounterMode = TIM_CounterMode_Up ;     //计数模式 上升计数
+	 TIM_Structure.TIM_ClockDivision = TIM_CKD_DIV1;     //时钟分频      Tic=72M/（TIM_ClockDivision+1）
+	 TIM_Structure.TIM_RepetitionCounter = 0; //重复计数的次数
+	
+	 TIM_TimeBaseInit(TIM1,&TIM_Structure);   //初始化定时器1
+	
+	 NVIC_TIM.NVIC_IRQChannel = TIM1_UP_IRQn;  //定时器1的向上计算通道
+	 NVIC_TIM.NVIC_IRQChannelCmd = ENABLE ;    //使能
+	 NVIC_TIM.NVIC_IRQChannelPreemptionPriority = 0 ;    //抢占优先级
+	 NVIC_TIM.NVIC_IRQChannelSubPriority = 0;            //响应优先级 
+	
+	 NVIC_Init(&NVIC_TIM);                     //初始化结构体
+	 
+	 TIM_ClearFlag(TIM1,TIM_FLAG_Update);      //清空所有标志位  保证工作状态初始化 
+	 
+	 TIM_ITConfig(TIM1,TIM_IT_Update,ENABLE);  //打开计时器
+	
+	 TIM_Cmd(TIM1,ENABLE);      	  	 	       //打开TIM1
+	
+	 
+}	
+
+/*****定时器1中断响应函数*****/
+/*   需要查询中断函数名字 请打开 startup_stm32f10x_hd.s启动文件查询对应的中断响应名字*/
+/*   说明：TIM_ClearFlag()函数是清除该定时器的所有标志位  
+          一个定时器的标志位包括很多如 TIM_IT_Update TIM_IT_CC1 TIM_IT_CC2 TIM_IT_CC3 等 
+          所以我们用具体清空标志位函数TIM_ClearITPendingBit() 对某个标志位进行清除 如果在没有几个标志位同时工作 两函数的使用效果应该是一样的  */
+
+void TIM1_UP_IRQHandler (void)                
+{
+	if(TIM_GetITStatus(TIM1,TIM_IT_Update) != RESET)   //如果中断标志被置1 证明有中断
+	{
+	 
+		TIM_ClearITPendingBit(TIM1,TIM_IT_Update);    // 清空标志位，为下一次进入中断做准备
+			Angle_Bias_X =Angle_Balance_X-Angle_Zero_X;		//获取Y方向的偏差
+		  Angle_Bias_Y =Angle_Balance_Y-Angle_Zero_Y;		//获取Y方向的偏差
+		  //Angle_Bias_Z =Angle_Zero_Z-Angle_Balance_Z;
+			//Angle_Bias_Z =0;
+			//Encoder_Analysis(Motor_A,Motor_B,Motor_C);  //正运动学分析，得到X Y Z 方向的速度
+//	    printf("compute_X:%d  ",compute_X);  //X 
+//			printf("compute_Y:%d  ",compute_Y); //Y
+// 			printf("compute_Z:%d\r\n",compute_Z);   //Z
+			Balance_Pwm_X= balance_X(Angle_Bias_X,Gyro_Balance_X);//X方向的倾角控制
+			Balance_Pwm_Y= -balance_Y(Angle_Bias_Y,Gyro_Balance_Y);	//Y方向的倾角控制
+			//Balance_Pwm_Z= -balance_Z(Angle_Bias_Z,Gyro_Balance_Z);		//Z方向倾角控制
+			//Velocity_Pwm_X=velocity_X(compute_X);      //X方向的速度控制
+			//Velocity_Pwm_Y=velocity_Y(compute_Y);  	  //Y方向的速度控制  
+			
+// 			printf("Balance_Pwm_X:%d  ",Balance_Pwm_X);  //X 
+//			printf("Balance_Pwm_Y:%d  ",Balance_Pwm_Y);  //X 
+//			printf("Balance_Pwm_Z:%d\r\n  ",Balance_Pwm_Z); //Y
+// 			printf("Angle_Bias_Z:%f\r\n",Angle_Balance_Z);   //Z
+			
+
+			
+			Move_X =Balance_Pwm_X+Velocity_Pwm_X;   //===X方向控制量累加					
+			Move_Y =Balance_Pwm_Y+Velocity_Pwm_Y;   //===Y方向控制量累加					
+			Move_Z=0;				 //===Z方向控制量累加	
+ 		  Kinematic_Analysis(Move_X,Move_Y,Move_Z);//逆运动学分析，得到A B C电机控制量
+			Motor_A=Target_A;//直接调节PWM占空比 
+			Motor_B=Target_B;//直接调节PWM占空比
+			Motor_C=Target_C;//直接调节PWM占空比
+			Gyro_Balance_X_last=Gyro_Balance_X;
+			Gyro_Balance_Y_last=Gyro_Balance_Y;
+			Gyro_Balance_Z_last=Gyro_Balance_Z;
+			Angle_Balance_X_last=Angle_Balance_X;
+			Angle_Balance_Y_last=Angle_Balance_Y;
+			Angle_Balance_Z_last=Angle_Balance_Z;
+	}
+  
+}
+
+
 //PWM输出初始化
 //arr：自动重装值
 //psc：时钟预分频数
  
-void TIM1_PWM_Init(u16 arr,u16 psc)
+void TIM2_PWM_Init(u16 arr,u16 psc)
 {
 	GPIO_InitTypeDef  GPIO_InitStructure;
 	TIM_TimeBaseInitTypeDef  TIM_TimeBaseStructure;

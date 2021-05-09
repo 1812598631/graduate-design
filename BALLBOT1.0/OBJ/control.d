@@ -42,3 +42,7 @@
 ..\obj\control.o: g:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
 ..\obj\control.o: g:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h
 ..\obj\control.o: ..\SYSTEM\usart\usart.h
+..\obj\control.o: ..\BALANCE\filter\filter.h
+..\obj\control.o: ..\HARDWARE\MOTOR\motor.h
+..\obj\control.o: ..\SYSTEM\delay\delay.h
+..\obj\control.o: ..\HARDWARE\PWM\pwm.h

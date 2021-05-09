@@ -46,3 +46,4 @@
 ..\obj\main.o: ..\SYSTEM\usart\usart.h
 ..\obj\main.o: ..\HARDWARE\LED\led.h
 ..\obj\main.o: ..\HARDWARE\CONTROL\control.h
+..\obj\main.o: ..\HARDWARE\OLED\OLED_I2C.h

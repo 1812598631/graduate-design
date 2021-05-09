@@ -65,6 +65,39 @@
 #define PGin(n)    BIT_ADDR(GPIOG_IDR_Addr,n)  //输入
 
 
+#define NTD0 -1
+#define NTD1 294
+#define NTD2 330
+#define NTD3 350
+#define NTD4 393
+#define NTD5 441
+#define NTD6 495
+#define NTD7 556
+
+#define NTDL1 147
+#define NTDL2 165
+#define NTDL3 175
+#define NTDL4 196
+#define NTDL5 221
+#define NTDL6 248
+#define NTDL7 278
+
+#define NTDH1 589
+#define NTDH2 661
+#define NTDH3 700
+#define NTDH4 786
+#define NTDH5 882
+#define NTDH6 990
+#define NTDH7 112
+
+#define WHOLE 1
+#define HALF 0.5
+#define QUARTER 0.25
+#define EIGHTH 0.25
+#define SIXTEENTH 0.625
+
+
+
 #include "ioi2c.h"
 #include "mpu6050.h"
 
@@ -79,10 +112,15 @@ extern short A_X,A_Y,A_Z;					 //X,Y,Z加速度
 
 extern int Target_A,Target_B,Target_C;     //电机目标值
 extern int compute_X,compute_Y,compute_Z;//正运动学解算三轴速度
-extern int Angle_Zero_X, Angle_Zero_Y,Angle_Bias_X, Angle_Bias_Y;
+extern float Angle_Zero_X, Angle_Zero_Y,Angle_Bias_X, Angle_Bias_Y;
 extern float Angle_Balance_X,Angle_Balance_Y,Angle_Balance_Z,Gyro_Balance_X,Gyro_Balance_Z,Gyro_Balance_Y,Move_X,Move_Y,Move_Z;   //三轴角度和XYZ轴目标速度
+extern float Angle_Balance_X_last,Angle_Balance_Y_last,Angle_Balance_Z_last,Gyro_Balance_X_last,Gyro_Balance_Y_last,Gyro_Balance_Z_last;
 extern float	Balance_Kp,Balance_Kd,Velocity_Kp,Velocity_Ki,Turn_Kp,Turn_Kd;  //控制PID参数
+extern int Balance_Pwm_X,Velocity_Pwm_X,Balance_Pwm_Y,Velocity_Pwm_Y,Balance_Pwm_Z;
+extern int Motor_A,Motor_B,Motor_C;        //电机PWM变量
+extern float bias_X,bias_Y,bias_Z,bias_x,bias_y,bias_z;
 
+extern u8 time_flag;
 //以下为汇编函数
 void WFI_SET(void);		//执行WFI指令
 void INTX_DISABLE(void);//关闭所有中断

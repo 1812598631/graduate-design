@@ -17,7 +17,7 @@ float PCt_0, PCt_1, E;
 float K_0, K_1, t_0, t_1;
 float Pdot[4] ={0,0,0,0};
 float PP[2][2] = { { 1, 0 },{ 0, 1 } };
-
+#define FILTERING_TIMES 10;
 /**************************************************************************
 函数功能：简易卡尔曼滤波
 入口参数：加速度、角速度
@@ -58,6 +58,53 @@ void Kalman_Filter(float Accel,float Gyro)
 	Q_bias	+= K_1 * Angle_err;	 //后验估计
 	angle_dot   = Gyro - Q_bias;	 //输出值(后验估计)的微分=角速度
 }
+/**************************************************************************
+函数功能：速度滤波
+入口参数：速度
+返回  值：滤波后的速度
+**************************************************************************/
+int Mean_Filter_X(int motor)
+{
+  u8 i;
+  s32 Sum_Speed = 0; 
+	s16 Filter_Speed;
+  s16 Speed_Buf[10];
+  for(i = 1 ; i<10; i++)//平滑数据
+  {
+    Speed_Buf[i - 1] = Speed_Buf[i];
+  }
+  Speed_Buf[10 - 1] =motor;
+  for(i = 0 ; i < 10; i++)
+  {
+    Sum_Speed += Speed_Buf[i];
+  }
+  Filter_Speed = (s16)(Sum_Speed / 10);//取平均
+	return Filter_Speed;
+}
+/**************************************************************************
+函数功能：速度滤波
+入口参数：速度
+返回  值：滤波后的速度
+**************************************************************************/
+int Mean_Filter_Y(int motor)
+{
+  u8 i;
+  s32 Sum_Speed = 0; 
+	s16 Filter_Speed;
+  s16 Speed_Buf[10];
+  for(i = 1 ; i<10; i++)
+  {
+    Speed_Buf[i - 1] = Speed_Buf[i];
+  }
+  Speed_Buf[10 - 1] =motor;
+  for(i = 0 ; i < 10; i++)
+  {
+    Sum_Speed += Speed_Buf[i];
+  }
+  Filter_Speed = (s16)(Sum_Speed / 10);//取平均
+	return Filter_Speed;
+}
+/*
 void Kalman_Filter_X(float Accel,float Gyro)		
 {
   static float Q_angle=0.001;// 过程噪声的协方差
@@ -103,11 +150,13 @@ void Kalman_Filter_X(float Accel,float Gyro)
 	Q_bias	+= K_1 * Angle_err;	 //后验估计
 	//angle_dot   = Gyro - Q_bias;	 //输出值(后验估计)的微分=角速度
 }
+*/
 /**************************************************************************
 函数功能：简易卡尔曼滤波
 入口参数：加速度、角速度
 返回  值：无
 **************************************************************************/
+/*
 void Kalman_Filter_Y(float Accel,float Gyro)		
 {
   static float Q_angle=0.001;// 过程噪声的协方差
@@ -153,7 +202,7 @@ void Kalman_Filter_Y(float Accel,float Gyro)
 	Q_bias	+= K_1 * Angle_err;	 //后验估计
 	//angle_dot   = Gyro - Q_bias;	 //输出值(后验估计)的微分=角速度
 }
-
+*/
 /**************************************************************************
 函数功能：一阶互补滤波
 入口参数：加速度、角速度

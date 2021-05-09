@@ -338,7 +338,7 @@
               <MiscControls></MiscControls>
               <Define>STM32F10X_MD,USE_STDPERIPH_DRIVER</Define>
               <Undefine></Undefine>
-              <IncludePath>..\HARDWARE\LED;..\SYSTEM\delay;..\SYSTEM\sys;..\SYSTEM\usart;..\USER;..\STM32F10x_FWLib\inc;..\CORE;..\HARDWARE\PWM;..\HARDWARE\CONTROL;..\HARDWARE\MOTOR;..\HARDWARE\IIC;..\BALANCE\DMP;..\BALANCE\filter;..\BALANCE\MPU6050</IncludePath>
+              <IncludePath>..\HARDWARE\LED;..\SYSTEM\delay;..\SYSTEM\sys;..\SYSTEM\usart;..\USER;..\STM32F10x_FWLib\inc;..\CORE;..\HARDWARE\PWM;..\HARDWARE\CONTROL;..\HARDWARE\MOTOR;..\HARDWARE\IIC;..\BALANCE\DMP;..\BALANCE\filter;..\BALANCE\MPU6050;..\HARDWARE\OLED</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -427,6 +427,11 @@
               <FileType>1</FileType>
               <FilePath>..\HARDWARE\IIC\IOI2C.c</FilePath>
             </File>
+            <File>
+              <FileName>OLED_I2C.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HARDWARE\OLED\OLED_I2C.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -501,6 +506,11 @@
               <FileName>stm32f10x_flash.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\STM32F10x_FWLib\src\stm32f10x_flash.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f10x_i2c.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\STM32F10x_FWLib\src\stm32f10x_i2c.c</FilePath>
             </File>
           </Files>
         </Group>

@@ -41,3 +41,5 @@
 ..\obj\pwm.o: g:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
 ..\obj\pwm.o: g:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
 ..\obj\pwm.o: g:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h
+..\obj\pwm.o: ..\HARDWARE\CONTROL\control.h
+..\obj\pwm.o: ..\SYSTEM\usart\usart.h
